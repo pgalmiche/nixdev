@@ -164,6 +164,37 @@
           PROMPT='%B%F{magenta}NixDev%f%b %F{cyan}%~%f$(__nix_git_branch) $ '
           eval "$(zoxide init zsh)"
 
+          # fzf shell integration. `pkgs.fzf` is on PATH but its ZLE widgets
+          # aren't bound until this runs: Ctrl+R (fuzzy history search popup),
+          # Ctrl+T (insert a file path), Alt+C (fuzzy cd), plus **-completion.
+          # Without it Ctrl+R falls back to zsh's bare, non-fuzzy binding.
+          eval "$(${pkgs.fzf}/bin/fzf --zsh)"
+
+          # History hygiene, mainly so Ctrl+R / autosuggestions aren't
+          # cluttered with repeats. ALL_DUPS drops the older copy whenever a
+          # duplicate is entered; IGNORE_SPACE skips commands typed with a
+          # leading space (handy for one-off/secret commands); REDUCE_BLANKS
+          # trims redundant whitespace; SHARE_HISTORY streams history live
+          # between every open pane (all share the HISTFILE above) instead of
+          # only merging at exit.
+          setopt HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS SHARE_HISTORY
+
+          # Real-time command coloring (valid command = green, unknown = red,
+          # plus quote/path/option highlighting) as you type. Its own docs
+          # require it be sourced *before* zsh-autosuggestions (below) and
+          # after any custom widgets, so it sits here - autosuggestions stays
+          # the last thing sourced.
+          source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+          # fish-style inline autosuggestions: greys out the most recent
+          # history match as you type; press End / Ctrl+E (or -> at line end)
+          # to accept. Sourced by store path so it needn't be on PATH. Uses
+          # the same HISTFILE above, so suggestions come from your real
+          # history. Kept last per the plugin's own guidance (it wraps ZLE
+          # widgets, so anything that rebinds them - like fzf above - must
+          # already be set up).
+          source ${pkgs.zsh-autosuggestions}/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
           # Auto-launch tmux on entering the shell. Guarded on $TMUX so
           # panes spawned inside tmux (which inherit this same ZDOTDIR)
           # don't try to nest another tmux server - see README's note on

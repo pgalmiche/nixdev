@@ -164,6 +164,18 @@
           PROMPT='%B%F{magenta}NixDev%f%b %F{cyan}%~%f$(__nix_git_branch) $ '
           eval "$(zoxide init zsh)"
 
+          # Vi mode on the command line, mirroring the nvim config where `kj`
+          # (and `jj`) escape insert mode (nvim/default.nix). `bindkey -v`
+          # switches the ZLE keymap from emacs to vi; then `kj` in insert
+          # mode (viins) drops to command mode (vicmd), same muscle memory as
+          # in the editor. KEYTIMEOUT is in hundredths of a second and governs
+          # how long zsh waits for the second key of `kj` - 20 (200ms) keeps a
+          # lone `k` responsive while still catching a quick `kj`.
+          bindkey -v
+          export KEYTIMEOUT=20
+          bindkey -M viins 'kj' vi-cmd-mode
+          bindkey -M viins 'jj' vi-cmd-mode
+
           # fzf shell integration. `pkgs.fzf` is on PATH but its ZLE widgets
           # aren't bound until this runs: Ctrl+R (fuzzy history search popup),
           # Ctrl+T (insert a file path), Alt+C (fuzzy cd), plus **-completion.

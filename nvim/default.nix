@@ -445,7 +445,33 @@
   lsp.servers = {
     nixd.enable = true;
     lua_ls.enable = true;
-    pyright.enable = true;
+    # Ruff (via none-ls/conform above) is the source of truth for Python
+    # linting + formatting. Pyright is kept only for navigation/hover/
+    # completion. Since deps live in Docker containers and not the local
+    # env, Pyright's import resolution and type checking produce false
+    # positives (reportMissingImports on numpy/pandas/... etc.), so all of
+    # its diagnostics are silenced here - let Ruff own the diagnostics.
+    pyright = {
+      enable = true;
+      config.settings.python.analysis = {
+        # Don't try to type-check against a Python env we don't have.
+        typeCheckingMode = "off";
+        # Only analyse open files, and don't reach into (missing) library
+        # code or auto-discover import search paths.
+        diagnosticMode = "openFilesOnly";
+        useLibraryCodeForTypes = false;
+        autoSearchPaths = false;
+        # Belt-and-braces: even with type checking off, explicitly mute the
+        # import-resolution diagnostics that fire when packages aren't
+        # installed locally.
+        diagnosticSeverityOverrides = {
+          reportMissingImports = "none";
+          reportMissingModuleSource = "none";
+          reportAttributeAccessIssue = "none";
+          reportUndefinedVariable = "none";
+        };
+      };
+    };
     ts_ls.enable = true;
   };
 

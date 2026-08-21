@@ -583,6 +583,7 @@
   <leader>fo   Recent files
   <leader>fb   Open buffers
   <leader>fm   Harpoon marks
+  / (visual)   Search selection in buffer (then n/N)
 
 ## Code intelligence
   gd           Go to definition (cross-file)
@@ -725,6 +726,13 @@ Press q or <Esc> to close.
     # opens a live-grep prompt; this variant greps the visually selected
     # text across the whole project instead of typing the query by hand.
     { mode = "v"; key = "<leader>fg"; action.__raw = ''function() vim.cmd('noau normal! "vy"'); local text = vim.fn.getreg("v"):gsub("\n", " "); require("telescope.builtin").grep_string({ search = text }) end''; options.desc = "Grep selection in project"; }
+
+    # In-buffer search of the visual selection: select text (e.g. `viw`), hit
+    # `/`, and it becomes the active search pattern - then n/N navigate matches,
+    # exactly like typing `/word<CR>` but without retyping. Yanked via register
+    # `v` (leaves the unnamed register untouched) and searched as a `\V` literal
+    # so regex metacharacters and multi-line selections match verbatim.
+    { mode = "x"; key = "/"; action.__raw = ''function() vim.cmd('noau normal! "vy'); local text = vim.fn.escape(vim.fn.getreg("v"), [[\]]):gsub("\n", [[\n]]); vim.fn.setreg("/", [[\V]] .. text); vim.fn.histadd("search", vim.fn.getreg("/")); vim.o.hlsearch = true; vim.cmd("normal! n") end''; options.desc = "Search selection in buffer"; }
 
     # Buffer ("tab") navigation via bufferline.
     { mode = "n"; key = "<S-h>"; action = ":BufferLineCyclePrev<CR>"; options.desc = "Previous buffer"; }

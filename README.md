@@ -4,6 +4,18 @@ Portable Neovim + tmux, declared entirely in Nix. No dotfiles to symlink, no
 plugin manager to bootstrap, no host system touched — copy this directory
 anywhere Nix runs and get the identical editor and terminal multiplexer.
 
+> New to Nix? Official install guide: <https://nix.dev/install-nix.html>.
+> On a plain / Docker install (no flakes enabled), get everything in two lines:
+>
+> ```sh
+> sh <(curl -L https://nixos.org/nix/install) --no-daemon
+> nix develop github:pgalmiche/nixdev --extra-experimental-features "nix-command flakes"
+> ```
+>
+> Note the two feature names go inside **one** set of quotes —
+> `nix-command` *and* `flakes` must both be enabled, or you'll hit
+> `experimental Nix feature 'nix-command' is disabled`.
+
 - [Quick start](#quick-start)
 - [Installing Nix](#installing-nix)
 - [Key bindings](#key-bindings)

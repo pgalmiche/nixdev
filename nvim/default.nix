@@ -6,7 +6,7 @@
 
   # Pinned so telescope/gitsigns work identically anywhere this flake runs,
   # regardless of what's (or isn't) installed on the host PATH.
-  extraPackages = with pkgs; [ git ripgrep fd ];
+  extraPackages = with pkgs; [ git ripgrep fd typescript-go ];
 
   # nvim-nio: dap-ui's async/UI-component dependency. Nixvim's dap-ui module
   # doesn't pull this in automatically, so it has to be added to the
@@ -472,7 +472,11 @@
         };
       };
     };
-    ts_ls.enable = true;
+    # Native (Go) TypeScript LSP from typescript-go 7.0.x - ~10x faster than
+    # the old JS-based typescript-language-server (ts_ls). Binary is `tsgo`,
+    # provided by pkgs.typescript-go in extraPackages above; nvim-lspconfig
+    # ships the `tsgo` server def (cmd: `tsgo --lsp --stdio`).
+    tsgo.enable = true;
   };
 
   # Registered on `LspAttach` (buffer-local, only where a language server is
@@ -655,6 +659,7 @@ Press q or <Esc> to close.
   keymaps = [
     { mode = "i"; key = "jj"; action = "<Esc>"; options.desc = "Escape insert mode"; }
     { mode = "i"; key = "kj"; action = "<Esc>"; options.desc = "Escape insert mode"; }
+    { mode = "v"; key = "kj"; action = "<Esc>"; options.desc = "Clear visual selection"; }
     { mode = "n"; key = "<leader>w"; action = ":w<CR>"; options.desc = "Save file"; }
     { mode = "n"; key = "<leader>q"; action = ":q<CR>"; options.desc = "Quit"; }
     { mode = "n"; key = "<C-h>"; action = "<C-w>h"; options.desc = "Focus left window"; }

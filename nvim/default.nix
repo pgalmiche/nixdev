@@ -6,7 +6,7 @@
 
   # Pinned so telescope/gitsigns work identically anywhere this flake runs,
   # regardless of what's (or isn't) installed on the host PATH.
-  extraPackages = with pkgs; [ git ripgrep fd typescript-go ];
+  extraPackages = with pkgs; [ git ripgrep fd typescript-language-server typescript ];
 
   # nvim-nio: dap-ui's async/UI-component dependency. Nixvim's dap-ui module
   # doesn't pull this in automatically, so it has to be added to the
@@ -472,11 +472,15 @@
         };
       };
     };
-    # Native (Go) TypeScript LSP from typescript-go 7.0.x - ~10x faster than
-    # the old JS-based typescript-language-server (ts_ls). Binary is `tsgo`,
-    # provided by pkgs.typescript-go in extraPackages above; nvim-lspconfig
-    # ships the `tsgo` server def (cmd: `tsgo --lsp --stdio`).
-    tsgo.enable = true;
+    # JS/TS LSP: typescript-language-server (ts_ls). It runs the project's own
+    # TypeScript (5.x, from node_modules), so its module resolution matches the
+    # build exactly. We tried tsgo (typescript-go 7.0.x) for speed, but TS 7.0
+    # has *removed* `baseUrl`, so it can't resolve baseUrl-based `src/...`
+    # imports and floods those buffers with false TS2307 errors that the real
+    # `tsc` 5.x build never reports. ts_ls doesn't have that problem. Binary is
+    # provided by pkgs.typescript-language-server in extraPackages above;
+    # nvim-lspconfig ships the `ts_ls` server def.
+    ts_ls.enable = true;
   };
 
   # Registered on `LspAttach` (buffer-local, only where a language server is

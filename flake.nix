@@ -23,6 +23,38 @@
           module = import ./nvim { inherit pkgs; };
         };
 
+        # Shell fragment (used by both the nvim wrapper and lazygit's editor
+        # script below) that sets $sock to a per-tmux-session nvim socket.
+        # session_id is stable for the life of a tmux session and identical
+        # in every pane of it, so an nvim in one pane and a lazygit in a
+        # sibling pane independently derive the same path and thus find each
+        # other. Non-tmux nvim never listens (there's no session to key on).
+        nvimSockSnippet = ''
+          sid=$(${pkgs.tmux}/bin/tmux display-message -p '#{session_id}' 2>/dev/null | ${pkgs.coreutils}/bin/tr -cd '[:alnum:]')
+          sock="''${XDG_RUNTIME_DIR:-/tmp}/nix-nvim-tmux-nvim-''${sid}.sock"
+        '';
+
+        # nvim wrapper: inside tmux, listen on the per-session socket so tools
+        # in sibling panes (lazygit) can open files in this instance over RPC.
+        # Only claims the socket if no live server already holds it (a second
+        # nvim in the same session just runs normally); a stale socket left by
+        # a crashed nvim is removed and reclaimed.
+        nvimWrapped = pkgs.writeShellScriptBin "nvim" ''
+          if [ -n "$TMUX" ]; then
+            ${nvimSockSnippet}
+            listen="--listen $sock"
+            if [ -e "$sock" ]; then
+              if ${nvim}/bin/nvim --server "$sock" --remote-expr '1' >/dev/null 2>&1; then
+                listen=""
+              else
+                ${pkgs.coreutils}/bin/rm -f "$sock"
+              fi
+            fi
+            exec ${nvim}/bin/nvim $listen "$@"
+          fi
+          exec ${nvim}/bin/nvim "$@"
+        '';
+
         # Mirrors the TPM plugin list from ~/.tmux.conf. `catppuccin` here is
         # the official catppuccin/tmux plugin (nixpkgs doesn't package the
         # dreamsofcode-io fork) - close in look, configurable via
@@ -55,13 +87,41 @@
           exec ${pkgs.tmux}/bin/tmux -L nix-nvim-tmux -f ${tmuxConf} "$@"
         '';
 
+        # Editor lazygit invokes for `e`. Rather than spawning a throwaway
+        # nvim inside lazygit's own pane, it reuses an nvim already running in
+        # a sibling pane of the same tmux session: connect to that nvim's
+        # socket (nvimSockSnippet), open the file with --remote, jump to the
+        # requested line, then switch tmux focus to the nvim pane. With no
+        # running nvim (or outside tmux) it falls back to editing inline,
+        # which is why lazygit keeps editInTerminal:true below.
+        lazygitEdit = pkgs.writeShellScript "lazygit-edit" ''
+          file="$1"
+          line="$2"
+          if [ -n "$TMUX" ]; then
+            ${nvimSockSnippet}
+            if ${nvim}/bin/nvim --server "$sock" --remote-expr '1' >/dev/null 2>&1; then
+              ${nvim}/bin/nvim --server "$sock" --remote "$file"
+              if [ -n "$line" ]; then
+                ${nvim}/bin/nvim --server "$sock" --remote-send "<C-\><C-n>''${line}G"
+              fi
+              win=$(${pkgs.tmux}/bin/tmux list-panes -s -f '#{==:#{pane_current_command},nvim}' -F '#{window_id}' 2>/dev/null | ${pkgs.coreutils}/bin/head -n1)
+              [ -n "$win" ] && ${pkgs.tmux}/bin/tmux select-window -t "$win"
+              exit 0
+            fi
+          fi
+          exec ${nvim}/bin/nvim ''${line:+"+$line"} "$file"
+        '';
+
         # Host lazygit (~/.config/lazygit/config.yml) opens edits in VS Code -
-        # that's left untouched. Inside this shell we want `e` to open the
-        # nvim from this flake instead, so lazygit here is a wrapper pointed
-        # at its own config file via -ucf rather than a host file edit.
+        # that's left untouched. Inside this shell `e` runs lazygitEdit (above)
+        # so edits land in an existing nvim; the wrapper points lazygit at its
+        # own config file via -ucf rather than touching a host file.
         lazygitConfig = pkgs.writeText "lazygit-config.yml" ''
           os:
-            editPreset: nvim
+            edit: '${lazygitEdit} {{filename}}'
+            editAtLine: '${lazygitEdit} {{filename}} {{line}}'
+            editAtLineAndWait: '${lazygitEdit} {{filename}} {{line}}'
+            editInTerminal: true
         '';
 
         lazygitWrapped = pkgs.writeShellScriptBin "lazygit" ''
@@ -224,7 +284,7 @@
           # version (brew, apt, ...) on $PATH. Nothing here touches the
           # host system - it all lives in the Nix store and disappears the
           # moment you leave the shell / garbage-collect it.
-          packages = [ nvim tmuxWrapped yaziWrapped pkgs.git pkgs.ripgrep pkgs.fd lazygitWrapped pkgs.lazydocker btopWrapped glowWrapped pkgs.fzf pkgs.jq pkgs.zoxide pkgs.zsh pkgs.claude-code pkgs.typescript-go ];
+          packages = [ nvimWrapped tmuxWrapped yaziWrapped pkgs.git pkgs.ripgrep pkgs.fd lazygitWrapped pkgs.lazydocker btopWrapped glowWrapped pkgs.fzf pkgs.jq pkgs.zoxide pkgs.zsh pkgs.claude-code ];
 
           shellHook = ''
             export EDITOR=nvim

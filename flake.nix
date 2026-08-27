@@ -100,6 +100,13 @@
           if [ -n "$TMUX" ]; then
             ${nvimSockSnippet}
             if ${nvim}/bin/nvim --server "$sock" --remote-expr '1' >/dev/null 2>&1; then
+              # If lazygit is running in that nvim's own floating terminal
+              # (the <leader>lg/<leader>ld binds), get the float out of the way
+              # first - otherwise it stays on top and hides the file we're
+              # about to open. Done before --remote so focus lands on a real
+              # window and the line-jump below targets the file, not the
+              # terminal buffer. No-op from a sibling tmux pane.
+              ${nvim}/bin/nvim --server "$sock" --remote-expr 'v:lua.NixvimHideFloatTerms()' >/dev/null 2>&1
               ${nvim}/bin/nvim --server "$sock" --remote "$file"
               if [ -n "$line" ]; then
                 ${nvim}/bin/nvim --server "$sock" --remote-send "<C-\><C-n>''${line}G"

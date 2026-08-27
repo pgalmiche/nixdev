@@ -13,7 +13,7 @@ anywhere Nix runs and get the identical editor and terminal multiplexer.
 > ```
 >
 > Note the two feature names go inside **one** set of quotes —
-> `nix-command` *and* `flakes` must both be enabled, or you'll hit
+> `nix-command` _and_ `flakes` must both be enabled, or you'll hit
 > `experimental Nix feature 'nix-command' is disabled`.
 
 - [Quick start](#quick-start)
@@ -31,15 +31,15 @@ nix develop
 tmux
 ```
 
-| Tool | Try this |
-| --- | --- |
-| Neovim | `Space`, then `?` — cheat sheet of the most-used commands |
-| tmux | `Ctrl+Space`, then `"` — split the pane |
-| lazygit | type `lazygit` — full git UI |
-| lazydocker | type `lazydocker` — full Docker UI |
-| btop | type `btop` — system resource monitor |
-| glow | type `glow README.md` — render markdown in the terminal |
-| fzf / jq | fuzzy-find and JSON-filter, pipe anything into them |
+| Tool       | Try this                                                  |
+| ---------- | --------------------------------------------------------- |
+| Neovim     | `Space`, then `?` — cheat sheet of the most-used commands |
+| tmux       | `Ctrl+Space`, then `"` — split the pane                   |
+| lazygit    | type `lazygit` — full git UI                              |
+| lazydocker | type `lazydocker` — full Docker UI                        |
+| btop       | type `btop` — system resource monitor                     |
+| glow       | type `glow README.md` — render markdown in the terminal   |
+| fzf / jq   | fuzzy-find and JSON-filter, pipe anything into them       |
 
 No Nix yet? → [Installing Nix](#installing-nix)
 
@@ -48,7 +48,7 @@ To move it to another machine: `rsync`/`scp` the directory over, no git required
 
 > Launch `tmux` from a plain terminal, not from inside an existing tmux
 > session — nesting can break pty handling and plugin loading only applies
-> when a *new* server starts.
+> when a _new_ server starts.
 
 ## Installing Nix
 
@@ -102,7 +102,7 @@ often blocked by a BIOS setting too.
 Official docs (in case any of this has shifted):
 [learn.microsoft.com/windows/wsl/install](https://learn.microsoft.com/windows/wsl/install)
 
-From here on, `cd`, `nix develop`, `tmux` all run *inside* Ubuntu/WSL, not
+From here on, `cd`, `nix develop`, `tmux` all run _inside_ Ubuntu/WSL, not
 in PowerShell directly.
 
 </details>
@@ -131,7 +131,7 @@ built-in uninstaller; removal is manual and more involved on macOS (a
 separate disk volume is created for `/nix`). See
 [nix.dev](https://nix.dev)'s installation docs.
 
-Just want to remove *this project's* footprint and keep Nix? Run
+Just want to remove _this project's_ footprint and keep Nix? Run
 `nix-collect-garbage -d` and see [Troubleshooting](#troubleshooting) for the
 one file it places outside the Nix store.
 
@@ -145,49 +145,49 @@ importance. `Space` alone (pause, no `?`) opens
 and alphabetical rather than curated. `:Telescope keymaps` fuzzy-searches
 everything; `:help` for full Neovim docs.
 
-| Action | Key |
-| --- | --- |
-| Save / quit | `<leader>w` / `<leader>q` |
-| Find files / grep / buffers | `<leader>ff` / `<leader>fg` / `<leader>fb` |
-| File explorer (Neo-tree) | `<leader>e` |
-| Go to definition | `gd` |
-| Git status | `<leader>gg` |
-| Diagnostics panel | `<leader>xx` |
-| Debugger: breakpoint / continue | `<leader>db` / `<leader>dc` |
-| Toggle terminal | `<leader>tt` |
+| Action                          | Key                                        |
+| ------------------------------- | ------------------------------------------ |
+| Save / quit                     | `<leader>w` / `<leader>q`                  |
+| Find files / grep / buffers     | `<leader>ff` / `<leader>fg` / `<leader>fb` |
+| File explorer (Neo-tree)        | `<leader>e`                                |
+| Go to definition                | `gd`                                       |
+| Git status                      | `<leader>gg`                               |
+| Diagnostics panel               | `<leader>xx`                               |
+| Debugger: breakpoint / continue | `<leader>db` / `<leader>dc`                |
+| Toggle terminal                 | `<leader>tt`                               |
 
 <details>
 <summary>Full Neovim reference</summary>
 
-| Action | Key |
-| --- | --- |
+| Action                                   | Key                                        |
+| ---------------------------------------- | ------------------------------------------ |
 | Help tags / recent files / resume picker | `<leader>fh` / `<leader>fo` / `<leader>fr` |
-| Document / workspace symbols | `<leader>fs` / `<leader>fw` |
-| Diff view: open / close / file history | `<leader>gd` / `<leader>gD` / `<leader>gh` |
-| Stage / reset / preview hunk | `<leader>hs` / `<leader>hr` / `<leader>hp` |
-| Next / previous git hunk | `]c` / `[c` |
-| Search & replace across files | `<leader>sr` |
-| Add / delete / replace surround | `sa` / `sd` / `sr` |
-| Select around/inside function or class | `af` `if` `ac` `ic` |
-| Debugger: step into / over / out | `<leader>di` / `<leader>do` / `<leader>dO` |
-| Toggle debug UI | `<leader>du` |
-| Move focus between windows | `<C-h/j/k/l>` |
-| Switch / jump to buffer N | `<S-h>` / `<S-l>`, `<leader>b1`…`b9` |
-| Close buffer | `<leader>bd` |
-| Harpoon: add / menu / jump to slot N | `<leader>a` / `<C-e>` / `<leader>1`…`4` |
-| Marks: toggle / next / prev / preview | `m;` / `m]` / `m[` / `m:` |
-| Folds: open all / close all / preview | `zR` / `zM` / `zK` |
+| Document / workspace symbols             | `<leader>fs` / `<leader>fw`                |
+| Diff view: open / close / file history   | `<leader>gd` / `<leader>gD` / `<leader>gh` |
+| Stage / reset / preview hunk             | `<leader>hs` / `<leader>hr` / `<leader>hp` |
+| Next / previous git hunk                 | `]c` / `[c`                                |
+| Search & replace across files            | `<leader>sr`                               |
+| Add / delete / replace surround          | `sa` / `sd` / `sr`                         |
+| Select around/inside function or class   | `af` `if` `ac` `ic`                        |
+| Debugger: step into / over / out         | `<leader>di` / `<leader>do` / `<leader>dO` |
+| Toggle debug UI                          | `<leader>du`                               |
+| Move focus between windows               | `<C-h/j/k/l>`                              |
+| Switch / jump to buffer N                | `<S-h>` / `<S-l>`, `<leader>b1`…`b9`       |
+| Close buffer                             | `<leader>bd`                               |
+| Harpoon: add / menu / jump to slot N     | `<leader>a` / `<C-e>` / `<leader>1`…`4`    |
+| Marks: toggle / next / prev / preview    | `m;` / `m]` / `m[` / `m:`                  |
+| Folds: open all / close all / preview    | `zR` / `zM` / `zK`                         |
 
 </details>
 
 **tmux** — prefix `Ctrl+Space`, then `?` lists every binding currently in
 effect (or `tmux list-keys` from outside tmux).
 
-| Action | Key |
-| --- | --- |
-| Split pane vertically / horizontally | prefix `"` / prefix `%` |
-| Switch window | `Alt+H` / `Alt+L` (no prefix) |
-| Copy mode → select → copy | prefix `[`, then `v`, then `y` |
+| Action                               | Key                            |
+| ------------------------------------ | ------------------------------ |
+| Split pane vertically / horizontally | prefix `"` / prefix `%`        |
+| Switch window                        | `Alt+H` / `Alt+L` (no prefix)  |
+| Copy mode → select → copy            | prefix `[`, then `v`, then `y` |
 
 ## What's inside
 

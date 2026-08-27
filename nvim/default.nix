@@ -602,6 +602,7 @@
 
 ## Git
   <leader>gg   Git status (Neogit)
+  <leader>lg   Lazygit (floating)
   <leader>gd   Open diff view
   <leader>gD   Close diff view
   <leader>gh   File history (repo)
@@ -640,10 +641,35 @@
 
 ## Terminal & misc
   <leader>tt   Toggle floating terminal
+  <leader>ld   Lazydocker (floating)
   zR / zM      Open/close all folds
 
 Press q or <Esc> to close.
 ]]
+
+    -- Hide any floating terminal window (e.g. the lazygit/lazydocker snacks
+    -- floats bound to <leader>lg/<leader>ld). Called over RPC by the
+    -- `lazygitEdit` helper (flake.nix) the instant an edit is triggered from
+    -- lazygit running *inside* nvim's own floating terminal: the file opens
+    -- in a buffer underneath via --remote, but without this the float stays
+    -- on top and hides it. Hiding (not closing) leaves lazygit's terminal job
+    -- running, so re-pressing <leader>lg brings it straight back where you
+    -- left off. No-op when no float is open - e.g. lazygit run from a sibling
+    -- tmux pane, the original cross-pane workflow - so it's safe on both paths.
+    function _G.NixvimHideFloatTerms()
+      for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+          local ok, cfg = pcall(vim.api.nvim_win_get_config, win)
+          if ok and cfg.relative ~= "" then
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].buftype == "terminal" then
+              pcall(vim.api.nvim_win_hide, win)
+            end
+          end
+        end
+      end
+      return ""
+    end
 
     _G.NixvimCheatsheet = {
       show = function()
@@ -690,6 +716,18 @@ Press q or <Esc> to close.
     { mode = "n"; key = "<leader>gD"; action = ":DiffviewClose<CR>"; options.desc = "Close diff view"; }
     { mode = "n"; key = "<leader>gh"; action = ":DiffviewFileHistory<CR>"; options.desc = "File history (repo)"; }
     { mode = "n"; key = "<leader>gH"; action = ":DiffviewFileHistory %<CR>"; options.desc = "File history (current file)"; }
+
+    # lazygit / lazydocker in a snacks floating terminal - the same TUIs you
+    # run in a sibling tmux pane, but toggleable over the current buffer for a
+    # quick check without leaving nvim. No new package: nvim always runs inside
+    # this flake's devShell, so `lazygit` (the RPC-edit-aware `lazygitWrapped`
+    # from flake.nix) and `lazydocker` are already on PATH - deliberately NOT
+    # added to extraPackages, since nixvim prepends those and a plain
+    # pkgs.lazygit would shadow the wrapper. Snacks.terminal keys the terminal
+    # by command, so re-pressing the key toggles the same instance rather than
+    # spawning a second one.
+    { mode = "n"; key = "<leader>lg"; action.__raw = ''function() Snacks.terminal("lazygit") end''; options.desc = "Lazygit"; }
+    { mode = "n"; key = "<leader>ld"; action.__raw = ''function() Snacks.terminal("lazydocker") end''; options.desc = "Lazydocker"; }
 
     # grug-far: project-wide search & replace (see plugins.grug-far comment above).
     { mode = "n"; key = "<leader>sr"; action.__raw = ''function() require("grug-far").open() end''; options.desc = "Search and replace"; }

@@ -143,7 +143,46 @@
           "--hidden"
           "--no-ignore"
         ];
-        defaults.file_ignore_patterns = [ "%.git/" ];
+        # Lua patterns (NOT globs/regex), matched against the relative path, so
+        # a literal "." must be escaped as "%.". --no-ignore above re-surfaces
+        # .gitignore'd files on purpose (to see .env*), which also drags build
+        # artifacts back in - subtract those out here. Trailing "/" (rather than
+        # a leading anchor) matches both root-level "dist/..." and nested
+        # "packages/app/dist/...", while sparing "redistribute/".
+        defaults.file_ignore_patterns = [
+          "%.git/"
+
+          # JS / React / NestJS build output + caches
+          "dist/"
+          "build/"
+          "node_modules/"
+          "%.next/"
+          "%.turbo/"
+          "%.vite/"
+          "%.cache/"
+          "coverage/"
+          "storybook%-static/"
+          "%.eslintcache"
+          "package%-lock%.json"
+          "yarn%.lock"
+          "pnpm%-lock%.yaml"
+
+          # Python bytecode, virtualenvs, tool caches, coverage
+          "__pycache__/"
+          "%.pyc"
+          "%.venv/"
+          "venv/"
+          "%.mypy_cache/"
+          "%.pytest_cache/"
+          "%.ruff_cache/"
+          "%.egg%-info/"
+          "htmlcov/"
+          "%.coverage"
+
+          # Misc noise
+          "%.DS_Store"
+          "%.log"
+        ];
         pickers.find_files.hidden = true;
         pickers.find_files.no_ignore = true;
 

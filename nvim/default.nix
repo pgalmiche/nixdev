@@ -775,6 +775,8 @@ Press q or <Esc> to close.
 
     # grug-far: project-wide search & replace (see plugins.grug-far comment above).
     { mode = "n"; key = "<leader>sr"; action.__raw = ''function() require("grug-far").open() end''; options.desc = "Search and replace"; }
+    # Visual variant: opens grug-far with the current selection prefilled as the search term.
+    { mode = "v"; key = "<leader>sr"; action.__raw = ''function() require("grug-far").with_visual_selection() end''; options.desc = "Search and replace (selection)"; }
 
     # markdown-preview: toggle the browser preview (see plugins.markdown-preview comment above).
     { mode = "n"; key = "<leader>mp"; action = ":MarkdownPreviewToggle<CR>"; options.desc = "Toggle markdown preview"; }

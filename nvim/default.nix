@@ -675,6 +675,7 @@
 ## Buffers & windows
   <S-h> / <S-l>      Previous/next buffer
   <leader>b1..b9     Go to buffer N
+  <leader>bb         Pick buffer by flashed letter
   <leader>bd         Close buffer
   <C-h/j/k/l>        Focus window left/down/up/right
 
@@ -830,6 +831,8 @@ Press q or <Esc> to close.
     # Buffer ("tab") navigation via bufferline.
     { mode = "n"; key = "<S-h>"; action = ":BufferLineCyclePrev<CR>"; options.desc = "Previous buffer"; }
     { mode = "n"; key = "<S-l>"; action = ":BufferLineCycleNext<CR>"; options.desc = "Next buffer"; }
+    # Flash a letter over each buffer/tab, then press that letter to jump to it.
+    { mode = "n"; key = "<leader>bb"; action = ":BufferLinePick<CR>"; options.desc = "Pick buffer (letter)"; }
     { mode = "n"; key = "<leader>bp"; action = ":BufferLineTogglePin<CR>"; options.desc = "Pin buffer"; }
     { mode = "n"; key = "<leader>bo"; action = ":BufferLineCloseOthers<CR>"; options.desc = "Close other buffers"; }
     { mode = "n"; key = "<leader>bd"; action.__raw = ''function() require("mini.bufremove").delete(0, false) end''; options.desc = "Close buffer"; }

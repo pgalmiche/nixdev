@@ -179,6 +179,11 @@
           "htmlcov/"
           "%.coverage"
 
+          # Generated Prisma migration SQL (committed, so not caught by
+          # --no-ignore). Scoped to the migrations dir so hand-written .sql
+          # (seeds, ad-hoc queries) stays findable.
+          "prisma/migrations/"
+
           # Misc noise
           "%.DS_Store"
           "%.log"

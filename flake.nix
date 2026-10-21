@@ -291,7 +291,7 @@
           # version (brew, apt, ...) on $PATH. Nothing here touches the
           # host system - it all lives in the Nix store and disappears the
           # moment you leave the shell / garbage-collect it.
-          packages = [ nvimWrapped tmuxWrapped yaziWrapped pkgs.git pkgs.ripgrep pkgs.fd lazygitWrapped pkgs.lazydocker btopWrapped glowWrapped pkgs.fzf pkgs.jq pkgs.zoxide pkgs.zsh];
+          packages = [ nvimWrapped tmuxWrapped yaziWrapped pkgs.git pkgs.gh pkgs.ripgrep pkgs.fd lazygitWrapped pkgs.lazydocker btopWrapped glowWrapped pkgs.fzf pkgs.jq pkgs.zoxide pkgs.zsh];
 
           shellHook = ''
             export EDITOR=nvim
